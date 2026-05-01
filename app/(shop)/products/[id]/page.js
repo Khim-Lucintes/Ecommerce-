@@ -1,7 +1,13 @@
 import { getProductById } from '@/services/products';
+import { getProductRating } from '@/services/reviews';
+import { cookies } from 'next/headers';
+import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import AddToCartButton from '@/components/ui/AddToCartButton';
+import ReviewList from '@/components/ui/ReviewList';
+import ReviewSection from '@/components/ui/ReviewSection';
 
 export async function generateMetadata({ params }) {
     const { id } = await params;
@@ -15,7 +21,14 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductDetailPage({ params }) {
     const { id } = await params;
-    const product = await getProductById(Number(id));
+
+    const cookieStore = await cookies();
+    const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
+
+    const [product, ratingData] = await Promise.all([
+        getProductById(Number(id)),
+        getProductRating(Number(id)),
+    ]);
 
     if (!product) notFound();
 
@@ -23,6 +36,9 @@ export default async function ProductDetailPage({ params }) {
         style: 'currency',
         currency: 'PHP',
     });
+
+    const isLoggedIn  = !!payload;
+    const isCustomer  = payload?.role === 'customer';
 
     return (
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -70,6 +86,15 @@ export default async function ProductDetailPage({ params }) {
                         </Link>
                     </div>
 
+                    {/* Inline rating badge */}
+                    {ratingData.count > 0 && (
+                        <div className="mt-2 flex items-center gap-2">
+                            <span className="text-amber-400 text-sm">{'★'.repeat(Math.round(ratingData.average))}{'☆'.repeat(5 - Math.round(ratingData.average))}</span>
+                            <span className="text-sm font-semibold text-gray-700">{ratingData.average}</span>
+                            <span className="text-xs text-gray-400">({ratingData.count} review{ratingData.count !== 1 ? 's' : ''})</span>
+                        </div>
+                    )}
+
                     <p className="mt-4 text-3xl font-extrabold text-indigo-600">{formattedPrice}</p>
 
                     {/* Stock */}
@@ -85,60 +110,23 @@ export default async function ProductDetailPage({ params }) {
                         </div>
                     )}
 
-                    {/* Add to cart button */}
+                    {/* Add to cart */}
                     <div className="mt-8">
-                        <Link
-                            href="/cart"
-                            className={`flex items-center justify-center gap-2 w-full rounded-xl py-3 text-sm font-semibold transition
-                                ${product.stock > 0
-                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none'}`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-                        </Link>
+                        <AddToCartButton productId={product.product_id} stock={product.stock} />
                     </div>
                 </div>
             </div>
+
+            {/* Reviews section */}
+            <ReviewList productId={product.product_id} />
+
+            <div className="mt-8">
+                <ReviewSection
+                    productId={product.product_id}
+                    isLoggedIn={isLoggedIn}
+                    isCustomer={isCustomer}
+                />
+            </div>
         </div>
-    );
-}
-<p className="mt-4 text-3xl font-extrabold text-indigo-600">{formattedPrice}</p>
-
-{/* Stock */ }
-<p className={`mt-1 text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-</p>
-
-{/* Description */ }
-{
-    product.description && (
-        <div className="mt-6 border-t border-gray-100 pt-6">
-            <h2 className="text-sm font-semibold text-gray-700 mb-2">Description</h2>
-            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{product.description}</p>
-        </div>
-    )
-}
-
-{/* Add to cart */ }
-<div className="mt-8">
-    <AddToCartButton productId={product.product_id} stock={product.stock} />
-</div>
-                </div >
-            </div >
-
-    {/* Reviews section */ }
-    < ReviewList productId = { product.product_id } />
-
-        <div className="mt-8">
-            <ReviewSection
-                productId={product.product_id}
-                isLoggedIn={isLoggedIn}
-                isCustomer={isCustomer}
-            />
-        </div>
-        </div >
     );
 }

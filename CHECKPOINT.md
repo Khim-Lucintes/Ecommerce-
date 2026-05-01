@@ -1,6 +1,6 @@
 # 📍 Project Checkpoint
 
-**Project**: E-Commerce System (Multi-Vendor / Shopee-like)
+**Project**: Lazapee (Multi-Vendor Marketplace)
 **Plan Reference**: `nextjs_ecommerce_plan_v2.md`
 **Last Updated**: 2026-05-01 (All phases complete ✅)
 **Stack**: Next.js 16.2.4 · React 19.2.4 · TiDB Cloud · Tailwind CSS v4 · mysql2 (raw SQL, no ORM)
@@ -225,6 +225,7 @@ ecommerce-system/
 ├── alter_tables.js                                ✅ run once
 ├── migrate_cart_orders.js                         ✅ run once
 ├── proxy.js                                       ✅ Route protection
+├── seed_admin.js                                  ✅ run once (seeds admin@example.com)
 ├── seed_roles.js                                  ✅ run once
 ├── setup_db.js                                    ✅ run once
 ├── AGENTS.md                                      ✅ AI agent skill
@@ -252,9 +253,10 @@ JWT_SECRET    = (set in .env.local — change before production)
 
 ```bash
 node --env-file=.env.local setup_db.js             # 1. All schema tables
-node --env-file=.env.local seed_roles.js            # 2. admin/seller/customer roles
-node --env-file=.env.local alter_tables.js          # 3. price/stock/image_url columns
-node --env-file=.env.local migrate_cart_orders.js   # 4. cart_items + order_items tables
+node --env-file=.env.local seed_roles.js           # 2. admin/seller/customer roles
+node --env-file=.env.local seed_admin.js           # 3. creates admin@example.com
+node --env-file=.env.local alter_tables.js         # 4. price/stock/image_url columns
+node --env-file=.env.local migrate_cart_orders.js  # 5. cart_items + order_items tables
 ```
 
 ---
@@ -271,6 +273,7 @@ node --env-file=.env.local migrate_cart_orders.js   # 4. cart_items + order_item
 - ECONNRESET on first request is normal on TiDB free tier — pool auto-recovers
 - Seller must **create a store first** before listing products
 - Admin sees all users/products/orders — role promotion coming in Phase 6+
+- **File Recovery Note**: On 2026-05-01, several `services/*.js` and `app/api/**` files were inadvertently deleted during a `Remove-Item` glitch. They were manually restored, completing the fix for `Module not found` and `404` errors in the Cart/Admin routes.
 
 ---
 
