@@ -4,14 +4,19 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import VoucherInput from '@/components/ui/VoucherInput';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function CartPage() {
     const router = useRouter();
-    const [items, setItems]       = useState([]);
-    const [total, setTotal]       = useState('0.00');
-    const [loading, setLoading]   = useState(true);
-    const [checking, setChecking] = useState(false);
-    const [error, setError]       = useState('');
+    const [items, setItems]         = useState([]);
+    const [total, setTotal]         = useState('0.00');
+    const [loading, setLoading]     = useState(true);
+    const [checking, setChecking]   = useState(false);
+    const [error, setError]         = useState('');
+    const [voucher, setVoucher]     = useState(null); // { discount, final_total, ... }
 
     const fetchCart = useCallback(async () => {
         try {
@@ -59,6 +64,10 @@ export default function CartPage() {
         }
     };
 
+    const cartTotal = Number(total);
+    const finalTotal = voucher ? voucher.final_total : cartTotal;
+    const savings    = voucher ? voucher.discount : 0;
+
     if (loading) {
         return (
             <div className="flex h-64 items-center justify-center">
@@ -88,66 +97,80 @@ export default function CartPage() {
                     {/* Items list */}
                     <div className="lg:col-span-2 space-y-4">
                         {items.map(item => (
-                            <div key={item.cart_item_id} className="flex gap-4 rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-                                <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-gray-100">
-                                    {item.image_url ? (
-                                        <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center text-gray-300 text-2xl">📦</div>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-1 flex-col gap-1">
-                                    <p className="text-sm font-semibold text-gray-900 line-clamp-1">{item.product_name}</p>
-                                    <p className="text-xs text-gray-400">{item.store_name}</p>
-                                    <p className="text-sm font-bold text-indigo-600">
-                                        ₱{Number(item.price).toLocaleString()}
-                                    </p>
-
-                                    <div className="flex items-center justify-between mt-auto">
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => updateQty(item.cart_item_id, item.quantity - 1)}
-                                                className="h-7 w-7 rounded-full border text-gray-600 hover:bg-gray-100 flex items-center justify-center text-lg font-bold">−</button>
-                                            <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
-                                            <button onClick={() => updateQty(item.cart_item_id, item.quantity + 1)}
-                                                className="h-7 w-7 rounded-full border text-gray-600 hover:bg-gray-100 flex items-center justify-center text-lg font-bold">+</button>
-                                        </div>
-                                        <button onClick={() => removeItem(item.cart_item_id)}
-                                            className="text-xs text-red-400 hover:text-red-600">Remove</button>
+                            <Card key={item.cart_item_id} className="overflow-hidden">
+                                <CardContent className="flex gap-4 p-4">
+                                    <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-muted">
+                                        {item.image_url ? (
+                                            <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-muted-foreground text-2xl">📦</div>
+                                        )}
                                     </div>
-                                </div>
-                            </div>
+                                    <div className="flex flex-1 flex-col gap-1">
+                                        <p className="text-sm font-semibold text-foreground line-clamp-1">{item.product_name}</p>
+                                        <p className="text-xs text-muted-foreground">{item.store_name}</p>
+                                        <p className="text-sm font-bold text-primary">₱{Number(item.price).toLocaleString()}</p>
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <div className="flex items-center gap-2">
+                                                <Button onClick={() => updateQty(item.cart_item_id, item.quantity - 1)}
+                                                    variant="outline" size="icon" className="h-7 w-7 rounded-full shrink-0">−</Button>
+                                                <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
+                                                <Button onClick={() => updateQty(item.cart_item_id, item.quantity + 1)}
+                                                    variant="outline" size="icon" className="h-7 w-7 rounded-full shrink-0">+</Button>
+                                            </div>
+                                            <Button onClick={() => removeItem(item.cart_item_id)}
+                                                variant="ghost" size="sm" className="h-auto px-2 py-1 text-xs text-destructive hover:text-destructive">Remove</Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
 
                     {/* Order summary */}
-                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 h-fit">
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Order Summary</h2>
-                        <div className="space-y-2 text-sm text-gray-600">
-                            <div className="flex justify-between">
-                                <span>Items ({items.length})</span>
-                                <span>₱{Number(total).toLocaleString()}</span>
+                    <Card className="h-fit">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-base">Order Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {/* Voucher input */}
+                            <div className="relative">
+                                <VoucherInput cartTotal={cartTotal} onApply={setVoucher} />
                             </div>
-                            <div className="flex justify-between">
-                                <span>Shipping</span>
-                                <span className="text-green-600">Free</span>
+
+                            <div className="space-y-2 text-sm text-muted-foreground border-t pt-3">
+                                <div className="flex justify-between">
+                                    <span>Subtotal ({items.length} items)</span>
+                                    <span>₱{cartTotal.toLocaleString()}</span>
+                                </div>
+                                {savings > 0 && (
+                                    <div className="flex justify-between text-green-600">
+                                        <span>Discount</span>
+                                        <span>-₱{savings.toLocaleString()}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span>Shipping</span>
+                                    <span className="text-green-600">Free</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="mt-4 border-t pt-4 flex justify-between font-bold text-gray-900">
-                            <span>Total</span>
-                            <span>₱{Number(total).toLocaleString()}</span>
-                        </div>
-                        <button
-                            onClick={checkout}
-                            disabled={checking}
-                            className="mt-6 w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition"
-                        >
-                            {checking ? 'Processing…' : 'Proceed to Payment'}
-                        </button>
-                        <Link href="/products" className="mt-3 block text-center text-xs text-gray-400 hover:text-gray-600">
-                            Continue Shopping
-                        </Link>
-                    </div>
+                            <div className="border-t pt-3 flex justify-between font-bold text-foreground text-base">
+                                <span>Total</span>
+                                <span>₱{finalTotal.toLocaleString()}</span>
+                            </div>
+                            <Button
+                                onClick={checkout}
+                                disabled={checking}
+                                className="w-full"
+                                size="lg"
+                            >
+                                {checking ? 'Processing…' : 'Proceed to Payment'}
+                            </Button>
+                            <Link href="/products" className={cn(buttonVariants({ variant: 'link' }), "w-full h-auto p-0 text-muted-foreground")}>
+                                Continue Shopping
+                            </Link>
+                        </CardContent>
+                    </Card>
                 </div>
             )}
         </div>

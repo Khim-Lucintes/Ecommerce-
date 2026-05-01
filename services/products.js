@@ -36,7 +36,7 @@ export async function getProductById(id) {
         `SELECT
             p.product_id, p.product_name, p.description,
             p.price, p.stock, p.image_url, p.created_at,
-            s.store_id, s.store_name,
+            s.store_id, s.store_name, s.owner_id,
             c.category_id, c.category_name
          FROM product_table p
          JOIN store_table   s ON p.store_id    = s.store_id

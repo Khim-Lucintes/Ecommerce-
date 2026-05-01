@@ -2,6 +2,8 @@ import { getProducts } from '@/services/products';
 import { getCategories } from '@/services/categories';
 import ProductCard from '@/components/ui/ProductCard';
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export const metadata = {
     title: 'Lazapee — Multi-Vendor Marketplace',
@@ -22,15 +24,14 @@ export default async function HomePage() {
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
                     Your One-Stop Marketplace
                 </h1>
-                <p className="mt-4 text-indigo-100 text-lg max-w-xl mx-auto">
+                <p className="mt-4 text-primary-foreground/90 text-lg max-w-xl mx-auto">
                     Browse thousands of products from trusted sellers. Fast. Easy. Affordable.
                 </p>
-                <Link
-                    href="/products"
-                    className="mt-8 inline-block rounded-xl bg-white px-8 py-3 text-sm font-bold text-indigo-600 shadow hover:shadow-md hover:bg-indigo-50 transition"
-                >
-                    Shop Now →
-                </Link>
+                <div className="mt-8 flex justify-center">
+                    <Link href="/products" className={cn(buttonVariants({ size: 'lg', variant: 'secondary' }), "rounded-xl font-bold px-8 shadow")}>
+                        Shop Now →
+                    </Link>
+                </div>
             </section>
 
             {/* Categories */}
@@ -42,7 +43,7 @@ export default async function HomePage() {
                             <Link
                                 key={cat.category_id}
                                 href={`/products?category_id=${cat.category_id}`}
-                                className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-700 hover:border-indigo-400 hover:text-indigo-600 transition"
+                                className={cn(buttonVariants({ variant: 'outline' }), "rounded-full px-4")}
                             >
                                 {cat.category_name}
                             </Link>
@@ -55,7 +56,7 @@ export default async function HomePage() {
             <section>
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-gray-900">Featured Products</h2>
-                    <Link href="/products" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link href="/products" className={cn(buttonVariants({ variant: 'link' }), "px-0")}>
                         View all →
                     </Link>
                 </div>

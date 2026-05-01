@@ -1,4 +1,6 @@
 import { getReviewsByProduct, getProductRating } from '@/services/reviews';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 function StarDisplay({ rating, size = 'sm' }) {
     const full = Math.round(Number(rating));
@@ -27,49 +29,48 @@ export default async function ReviewList({ productId }) {
             ) : (
                 <>
                     {/* Summary */}
-                    <div className="flex items-center gap-6 mb-8 p-5 rounded-2xl bg-gray-50 border border-gray-100">
-                        <div className="text-center">
-                            <p className="text-5xl font-extrabold text-gray-900">{ratingData.average}</p>
-                            <StarDisplay rating={ratingData.average} size="lg" />
-                            <p className="text-xs text-gray-400 mt-1">{ratingData.count} review{ratingData.count !== 1 ? 's' : ''}</p>
-                        </div>
-                        <div className="flex-1 space-y-1.5">
-                            {[5, 4, 3, 2, 1].map(star => {
-                                const count = ratingData.breakdown[star];
-                                const pct   = ratingData.count > 0 ? Math.round((count / ratingData.count) * 100) : 0;
-                                return (
-                                    <div key={star} className="flex items-center gap-2 text-xs text-gray-500">
-                                        <span className="w-6 text-right">{star}★</span>
-                                        <div className="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                                            <div
-                                                className="h-full rounded-full bg-amber-400 transition-all"
-                                                style={{ width: `${pct}%` }}
-                                            />
+                    <Card className="mb-8">
+                        <CardContent className="flex items-center gap-6 p-6">
+                            <div className="text-center">
+                                <p className="text-5xl font-extrabold text-foreground">{ratingData.average}</p>
+                                <StarDisplay rating={ratingData.average} size="lg" />
+                                <p className="text-xs text-muted-foreground mt-1">{ratingData.count} review{ratingData.count !== 1 ? 's' : ''}</p>
+                            </div>
+                            <div className="flex-1 space-y-2">
+                                {[5, 4, 3, 2, 1].map(star => {
+                                    const count = ratingData.breakdown[star];
+                                    const pct   = ratingData.count > 0 ? Math.round((count / ratingData.count) * 100) : 0;
+                                    return (
+                                        <div key={star} className="flex items-center gap-3 text-xs text-muted-foreground">
+                                            <span className="w-8 text-right">{star} ★</span>
+                                            <Progress value={pct} className="h-2 flex-1" />
+                                            <span className="w-8">{count}</span>
                                         </div>
-                                        <span className="w-6">{count}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                                    );
+                                })}
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Reviews list */}
                     <div className="space-y-4">
                         {reviews.map(r => (
-                            <div key={r.review_id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-900">{r.reviewer_name}</p>
-                                        <StarDisplay rating={r.rating} />
+                            <Card key={r.review_id}>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div>
+                                            <p className="text-sm font-semibold text-foreground">{r.reviewer_name}</p>
+                                            <StarDisplay rating={r.rating} />
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(r.created_at).toLocaleDateString()}
+                                        </p>
                                     </div>
-                                    <p className="text-xs text-gray-400">
-                                        {new Date(r.created_at).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                {r.comment && (
-                                    <p className="text-sm text-gray-600 leading-relaxed mt-1">{r.comment}</p>
-                                )}
-                            </div>
+                                    {r.comment && (
+                                        <p className="text-sm text-foreground/80 leading-relaxed mt-1">{r.comment}</p>
+                                    )}
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
                 </>

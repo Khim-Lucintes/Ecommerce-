@@ -18,6 +18,7 @@
 | **Phase 4** | Cart & Orders | ✅ Done |
 | **Phase 5** | Dashboards | ✅ Done |
 | **Phase 6** | Reviews | ✅ Done |
+| **Phase 7** | Chat · Wishlist · Vouchers · PWA | ✅ Done |
 
 ---
 
@@ -155,6 +156,49 @@
 
 ---
 
+## ✅ Phase 7 — Chat · Wishlist · Vouchers · PWA (Done)
+
+### Phase 7: UI Modernization & Shadcn Integration 🟢 (Completed)
+**Objective**: Transition the application to a modern, standardized design system using `shadcn/ui` and custom branding.
+- [x] Integrate `shadcn/ui` with Next.js 16 and Tailwind v4.
+- [x] Set up base components (Button, Card, Input, Label, Badge, Avatar, Table, Progress, etc.).
+- [x] Apply custom Lazapee Indigo brand theme (globals.css).
+- [x] Refactor Auth Pages (Login, Register) to use Shadcn components.
+- [x] Refactor Layout (Navbar, NavbarActions) with Shadcn components.
+- [x] Refactor Core UI (Home Page, Product Cards, Cart, AddToCart, ReviewList, ReviewForm).
+- [x] Refactor Dashboards (Admin, Seller) to use Table, Card, and Badge components.
+
+### Real-Time Chat (Polling)
+- [x] `services/chat.js` — getMessages, sendMessage, markRead, getConversations
+- [x] `app/api/chat/route.js` — GET (with read marking) · POST send message
+- [x] `components/ui/ChatWindow.js` — floating chat widget, 3-second polling, minimize/maximize, bubble UI
+- [x] Product detail page: floating ChatWindow appears for customers chatting with the store owner
+- [x] `migrate_phase7.js` — created `messages_table`
+
+### Wishlist
+- [x] `services/wishlist.js` — getWishlist, addToWishlist, removeFromWishlist, isWishlisted
+- [x] `app/api/wishlist/route.js` — GET · POST · DELETE
+- [x] `components/ui/WishlistButton.js` — heart toggle with fill animation + auth redirect
+- [x] `app/(shop)/wishlist/page.js` — full wishlist page with out-of-stock overlay
+- [x] Navbar: heart icon links to wishlist for customers
+- [x] Product detail: WishlistButton added alongside Add to Cart
+
+### Discount Codes & Vouchers
+- [x] `services/vouchers.js` — applyVoucher, redeemVoucher, createVoucher, getAllVouchers, toggleVoucher
+- [x] `app/api/vouchers/apply/route.js` — POST: validates code, min purchase, expiry, usage limit
+- [x] `app/api/admin/vouchers/route.js` — GET list · POST create · PATCH toggle active
+- [x] `components/ui/VoucherInput.js` — code input with savings display in cart
+- [x] `components/admin/VoucherManagement.js` — create form + management table in Admin Dashboard
+- [x] Cart page: VoucherInput integrated into order summary
+- [x] `migrate_phase7.js` — created `vouchers_table`
+
+### Progressive Web App (PWA)
+- [x] `public/manifest.json` — app name, icons, shortcuts, theme color
+- [x] `app/layout.js` — PWA meta tags: manifest link, apple-touch-icon, viewport, mobile-web-app-capable
+- [x] App installable from browser on Android/iOS as "Lazapee"
+
+---
+
 ## 🗂️ Current File Structure
 
 ```
@@ -164,22 +208,24 @@ ecommerce-system/
 │   │   ├── login/page.js                          ✅
 │   │   └── register/page.js                       ✅
 │   ├── (shop)/
-│   │   ├── cart/page.js                           ✅
+│   │   ├── cart/page.js                           ✅ + VoucherInput
+│   │   ├── wishlist/page.js                        ✅ Wishlist page
 │   │   └── products/
 │   │       ├── page.js                            ✅ Listing
-│   │       └── [id]/page.js                       ✅ Detail
+│   │       └── [id]/page.js                       ✅ Detail + Chat + Wishlist
 │   ├── (seller)/
 │   │   └── dashboard/
 │   │       ├── layout.js                          ✅ Auth guard + sidebar
 │   │       ├── page.js                            ✅ Overview
 │   │       └── products/
-│   │           ├── new/page.js                    ✅ Add product
-│   │           └── [id]/edit/page.js              ✅ Edit/delete
-│   ├── (admin)/
-│   │   └── dashboard/
-│   │       ├── layout.js                          ✅ Auth guard + sidebar
-│   │       └── page.js                            ✅ Stats + tables
+│   │           ├── new/page.js                    ✅ Add product + Cloudinary
+│   │           └── [id]/edit/page.js              ✅ Edit/delete + Cloudinary
+│   ├── seller/dashboard/ ← (actual routes, (seller) group removed)
+│   ├── admin/dashboard/  ← (actual routes, (admin) group removed)
 │   ├── api/
+│   │   ├── admin/
+│   │   │   ├── users/[id]/role/route.js           ✅ Role promotion
+│   │   │   └── vouchers/route.js                  ✅ Voucher CRUD
 │   │   ├── auth/
 │   │   │   ├── login/route.js                     ✅
 │   │   │   ├── logout/route.js                    ✅
@@ -189,26 +235,40 @@ ecommerce-system/
 │   │   │   ├── route.js                           ✅
 │   │   │   └── [id]/route.js                      ✅
 │   │   ├── categories/route.js                    ✅
+│   │   ├── chat/route.js                          ✅ Real-time polling
 │   │   ├── orders/route.js                        ✅
+│   │   ├── payments/[id]/complete/route.js        ✅ Payment gateway
 │   │   ├── products/
 │   │   │   ├── route.js                           ✅
 │   │   │   └── [id]/route.js                      ✅
-│   │   └── stores/
-│   │       └── mine/route.js                      ✅
+│   │   ├── reviews/route.js                       ✅
+│   │   ├── stores/mine/route.js                   ✅
+│   │   ├── upload/route.js                        ✅ Cloudinary upload
+│   │   └── vouchers/apply/route.js                ✅ Apply voucher
 │   ├── orders/[id]/page.js                        ✅ Order confirmation
+│   ├── (shop)/checkout/[id]/page.js               ✅ Mock payment page
 │   ├── globals.css                                ✅
-│   ├── layout.js                                  ✅ Navbar + footer
+│   ├── layout.js                                  ✅ Navbar + footer + PWA
 │   └── page.js                                    ✅ Home page
 │
 ├── components/
+│   ├── admin/
+│   │   ├── UserRoleSelect.js                      ✅ Role dropdown
+│   │   └── VoucherManagement.js                   ✅ Voucher panel
 │   ├── layout/
 │   │   ├── Navbar.js                              ✅ Server Component
-│   │   └── NavbarActions.js                       ✅ Client Component
+│   │   └── NavbarActions.js                       ✅ + Wishlist heart
 │   ├── seller/
 │   │   └── CreateStoreForm.js                     ✅ Client Component
 │   └── ui/
-│       ├── AddToCartButton.js                     ✅ Client Component
-│       └── ProductCard.js                         ✅
+│       ├── AddToCartButton.js                     ✅
+│       ├── ChatWindow.js                          ✅ Floating chat widget
+│       ├── ProductCard.js                         ✅ + star rating
+│       ├── ReviewForm.js                          ✅
+│       ├── ReviewList.js                          ✅
+│       ├── ReviewSection.js                       ✅
+│       ├── VoucherInput.js                        ✅
+│       └── WishlistButton.js                      ✅
 │
 ├── lib/
 │   ├── auth.js                                    ✅ JWT helpers
@@ -218,14 +278,22 @@ ecommerce-system/
 │   ├── admin.js                                   ✅
 │   ├── cart.js                                    ✅
 │   ├── categories.js                              ✅
+│   ├── chat.js                                    ✅ Phase 7
 │   ├── orders.js                                  ✅
-│   ├── products.js                                ✅
-│   └── stores.js                                  ✅
+│   ├── products.js                                ✅ + owner_id
+│   ├── reviews.js                                 ✅
+│   ├── stores.js                                  ✅
+│   ├── vouchers.js                                ✅ Phase 7
+│   └── wishlist.js                                ✅ Phase 7
+│
+├── public/
+│   └── manifest.json                              ✅ PWA manifest
 │
 ├── alter_tables.js                                ✅ run once
 ├── migrate_cart_orders.js                         ✅ run once
+├── migrate_phase7.js                              ✅ run once
 ├── proxy.js                                       ✅ Route protection
-├── seed_admin.js                                  ✅ run once (seeds admin@example.com)
+├── seed_admin.js                                  ✅ run once
 ├── seed_roles.js                                  ✅ run once
 ├── setup_db.js                                    ✅ run once
 ├── AGENTS.md                                      ✅ AI agent skill
@@ -254,9 +322,10 @@ JWT_SECRET    = (set in .env.local — change before production)
 ```bash
 node --env-file=.env.local setup_db.js             # 1. All schema tables
 node --env-file=.env.local seed_roles.js           # 2. admin/seller/customer roles
-node --env-file=.env.local seed_admin.js           # 3. creates admin@example.com
+node --env-file=.env.local seed_admin.js           # 3. creates admin@example.com / pw: admin123
 node --env-file=.env.local alter_tables.js         # 4. price/stock/image_url columns
 node --env-file=.env.local migrate_cart_orders.js  # 5. cart_items + order_items tables
+node --env-file=.env.local migrate_phase7.js       # 6. messages + wishlist + vouchers tables
 ```
 
 ---
@@ -272,16 +341,24 @@ node --env-file=.env.local migrate_cart_orders.js  # 5. cart_items + order_items
 - Checkout uses a **DB transaction** — atomically checks stock → inserts → deducts
 - ECONNRESET on first request is normal on TiDB free tier — pool auto-recovers
 - Seller must **create a store first** before listing products
-- Admin sees all users/products/orders — role promotion coming in Phase 6+
+- Admin sees all users/products/orders — role promotion done (Phase 7)
+- Chat uses **3-second polling** via `setInterval` — not WebSockets (no infra needed)
+- Voucher discount applied client-side in cart display; server-side enforcement is needed before final billing in a real production setting
+- PWA requires HTTPS in production for installability; works in dev with Chrome flags
 - **File Recovery Note**: On 2026-05-01, several `services/*.js` and `app/api/**` files were inadvertently deleted during a `Remove-Item` glitch. They were manually restored, completing the fix for `Module not found` and `404` errors in the Cart/Admin routes.
 
 ---
 
-## 🌟 Future Enhancements (Completed)
+## 🌟 All Enhancements — Completed ✅
 
-- [x] **Cloudinary Image Upload**: Added `cloudinary` npm package and `/api/upload` route for sellers to upload product images. Form inputs updated to support file streaming.
-- [x] **Admin Role Promotion**: Implemented `PUT /api/admin/users/[id]/role` and added `UserRoleSelect` to the Admin dashboard for instant role modifications.
-- [x] **Payment Gateway Integration**: Simulated GCash/PayPal checkout flow (`/checkout/[id]`) with `/api/payments/[id]/complete` processing logic. Order and payment tables accurately reflect 'paid' status.
-- [ ] Real-time chat (buyer ↔ seller)
-- [ ] Wishlist, discount codes & vouchers
-- Mobile app version
+| Feature | Status | Phase |
+|---|---|---|
+| Cloudinary image uploads | ✅ Done | Phase 6 |
+| Admin role promotion | ✅ Done | Phase 6 |
+| Payment gateway (mock GCash/PayPal) | ✅ Done | Phase 6 |
+| Product reviews & star ratings | ✅ Done | Phase 6 |
+| Real-time chat (buyer ↔ seller, polling) | ✅ Done | Phase 7 |
+| Wishlist with heart toggle | ✅ Done | Phase 7 |
+| Discount codes & vouchers | ✅ Done | Phase 7 |
+| Mobile app (PWA manifest) | ✅ Done | Phase 7 |
+| Rename to Lazapee | ✅ Done | Phase 7 |

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function AddToCartButton({ productId, stock }) {
     const router = useRouter();
@@ -44,19 +45,20 @@ export default function AddToCartButton({ productId, stock }) {
 
     if (stock < 1) {
         return (
-            <button disabled className="w-full rounded-xl bg-gray-100 py-3 text-sm font-semibold text-gray-400 cursor-not-allowed">
+            <Button disabled className="w-full" size="lg">
                 Out of Stock
-            </button>
+            </Button>
         );
     }
 
     return (
         <div className="space-y-2">
-            <button
+            <Button
                 onClick={handleAdd}
                 disabled={loading || added}
-                className={`w-full rounded-xl py-3 text-sm font-semibold transition flex items-center justify-center gap-2
-                    ${added ? 'bg-green-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60'}`}
+                size="lg"
+                variant={added ? "secondary" : "default"}
+                className={`w-full ${added ? 'bg-green-500 text-white hover:bg-green-600' : ''}`}
             >
                 {added ? (
                     <>
@@ -66,13 +68,13 @@ export default function AddToCartButton({ productId, stock }) {
                     'Adding...'
                 ) : (
                     <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Add to Cart
                     </>
                 )}
-            </button>
+            </Button>
             {error && <p className="text-xs text-red-500 text-center">{error}</p>}
         </div>
     );

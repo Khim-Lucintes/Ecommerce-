@@ -1,6 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 function StarPicker({ value, onChange }) {
     const [hovered, setHovered] = useState(0);
@@ -63,34 +67,40 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
-            <h3 className="text-sm font-semibold text-gray-800">Write a Review</h3>
+        <Card>
+            <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Write a Review</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <Label className="mb-2 block">Your rating <span className="text-destructive">*</span></Label>
+                        <StarPicker value={rating} onChange={setRating} />
+                    </div>
 
-            <div>
-                <p className="text-xs text-gray-500 mb-2">Your rating *</p>
-                <StarPicker value={rating} onChange={setRating} />
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="comment">Comment <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                        <Textarea
+                            id="comment"
+                            value={comment}
+                            onChange={e => setComment(e.target.value)}
+                            rows={3}
+                            placeholder="Share your experience…"
+                            className="resize-none"
+                        />
+                    </div>
 
-            <div>
-                <label className="text-xs text-gray-500 mb-1 block">Comment (optional)</label>
-                <textarea
-                    value={comment}
-                    onChange={e => setComment(e.target.value)}
-                    rows={3}
-                    placeholder="Share your experience…"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none transition"
-                />
-            </div>
+                    {error && <p className="text-xs text-destructive">{error}</p>}
 
-            {error && <p className="text-xs text-red-500">{error}</p>}
-
-            <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition"
-            >
-                {loading ? 'Submitting…' : 'Submit Review'}
-            </button>
-        </form>
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={loading}
+                    >
+                        {loading ? 'Submitting…' : 'Submit Review'}
+                    </Button>
+                </form>
+            </CardContent>
+        </Card>
     );
 }
