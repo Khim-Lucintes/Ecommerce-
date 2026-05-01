@@ -4,7 +4,7 @@ import ProductCard from '@/components/ui/ProductCard';
 import Link from 'next/link';
 
 export const metadata = {
-    title: 'Products — ShopEasy',
+    title: 'Products — Lazapee',
     description: 'Browse products from our multi-vendor marketplace.',
 };
 

@@ -1,0 +1,54 @@
+import pool from '@/lib/db';
+
+export async function getAdminStats() {
+    const [[{ total_users }]] = await pool.query('SELECT COUNT(*) AS total_users FROM profile_table');
+    const [[{ total_products }]] = await pool.query('SELECT COUNT(*) AS total_products FROM product_table');
+    const [[{ total_orders }]] = await pool.query('SELECT COUNT(*) AS total_orders FROM order_table');
+    const [[{ total_sales }]] = await pool.query('SELECT SUM(total_amount) AS total_sales FROM order_table WHERE status != "cancelled"');
+
+    return {
+        total_users,
+        total_products,
+        total_orders,
+        total_sales: total_sales || 0
+    };
+}
+
+export async function getAllUsers() {
+    const [rows] = await pool.query(`
+        SELECT p.profile_id, p.full_name, p.email, p.created_at, r.role_name
+        FROM profile_table p
+        JOIN role_table r ON p.role_id = r.role_id
+        ORDER BY p.created_at DESC
+    `);
+    return rows;
+}
+
+export async function getAllProducts() {
+    const [rows] = await pool.query(`
+        SELECT p.product_id, p.product_name, p.price, p.stock, p.created_at,
+               c.category_name, s.store_name
+        FROM product_table p
+        JOIN category_table c ON p.category_id = c.category_id
+        JOIN store_table s ON p.store_id = s.store_id
+        ORDER BY p.created_at DESC
+    `);
+    return rows;
+}
+
+export async function getAllOrders() {
+    const [rows] = await pool.query(`
+        SELECT o.order_id, o.total_amount, o.status, o.created_at,
+               p.full_name AS buyer_name,
+               pay.payment_method, pay.payment_status
+        FROM order_table o
+        JOIN profile_table p ON o.buyer_id = p.profile_id
+        LEFT JOIN payment_table pay ON o.order_id = pay.order_id
+        ORDER BY o.created_at DESC
+    `);
+    return rows;
+}
+
+export async function updateUserRole(profile_id, role_id) {
+    await pool.query('UPDATE profile_table SET role_id = ? WHERE profile_id = ?', [role_id, profile_id]);
+}

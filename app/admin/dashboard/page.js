@@ -1,6 +1,7 @@
 import { getAdminStats, getAllUsers, getAllProducts, getAllOrders } from '@/services/admin';
+import UserRoleSelect from '@/components/admin/UserRoleSelect';
 
-export const metadata = { title: 'Admin Dashboard — ShopEasy' };
+export const metadata = { title: 'Admin Dashboard — Lazapee' };
 
 const STATUS_COLORS = {
     pending:   'bg-yellow-100 text-yellow-700',
@@ -70,9 +71,7 @@ export default async function AdminDashboardPage() {
                                     <td className="px-6 py-3 font-medium text-gray-900">{u.full_name}</td>
                                     <td className="px-6 py-3 text-gray-500">{u.email}</td>
                                     <td className="px-6 py-3 text-center">
-                                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${ROLE_COLORS[u.role_name] || ''}`}>
-                                            {u.role_name}
-                                        </span>
+                                        <UserRoleSelect userId={u.profile_id} currentRole={u.role_name} />
                                     </td>
                                     <td className="px-6 py-3 text-right text-gray-400">
                                         {new Date(u.created_at).toLocaleDateString()}

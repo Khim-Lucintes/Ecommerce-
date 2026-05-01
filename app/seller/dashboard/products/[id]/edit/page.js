@@ -3,19 +3,40 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function NewProductPage() {
+export default function EditProductPage({ params }) {
     const router = useRouter();
+    const [productId, setProductId] = useState(null);
     const [categories, setCategories] = useState([]);
-    const [form, setForm] = useState({
-        product_name: '', description: '', price: '', stock: '', image_url: '', category_id: '',
-    });
+    const [form, setForm] = useState(null);
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading]   = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError]       = useState('');
 
     useEffect(() => {
-        fetch('/api/categories').then(r => r.json()).then(d => setCategories(d.categories || []));
-    }, []);
+        params.then(p => setProductId(p.id));
+    }, [params]);
+
+    useEffect(() => {
+        if (!productId) return;
+        Promise.all([
+            fetch(`/api/products/${productId}`).then(r => r.json()),
+            fetch('/api/categories').then(r => r.json()),
+        ]).then(([pData, cData]) => {
+            if (pData.product) {
+                const p = pData.product;
+                setForm({
+                    product_name: p.product_name,
+                    description:  p.description || '',
+                    price:        p.price,
+                    stock:        p.stock,
+                    image_url:    p.image_url || '',
+                    category_id:  p.category_id,
+                });
+            }
+            setCategories(cData.categories || []);
+        });
+    }, [productId]);
 
     const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -46,28 +67,46 @@ export default function NewProductPage() {
             }
         }
 
-        const res = await fetch('/api/products', {
-            method: 'POST',
+        const res = await fetch(`/api/products/${productId}`, {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ...form,
-                price: parseFloat(form.price),
-                stock: parseInt(form.stock) || 0,
+                price:       parseFloat(form.price),
+                stock:       parseInt(form.stock) || 0,
                 category_id: parseInt(form.category_id),
-                image_url: finalImageUrl,
+                image_url:   finalImageUrl,
             }),
         });
         const data = await res.json();
-        if (!res.ok) { setError(data.error || 'Failed to create product.'); setLoading(false); return; }
+        if (!res.ok) { setError(data.error || 'Failed to update.'); setLoading(false); return; }
         router.push('/seller/dashboard');
         router.refresh();
     };
 
+    const handleDelete = async () => {
+        if (!confirm('Delete this product? This cannot be undone.')) return;
+        setDeleting(true);
+        const res = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+        if (res.ok) { router.push('/seller/dashboard'); router.refresh(); }
+        else { setError('Failed to delete product.'); setDeleting(false); }
+    };
+
+    if (!form) {
+        return <div className="flex h-40 items-center justify-center"><div className="h-7 w-7 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" /></div>;
+    }
+
     return (
         <div className="max-w-xl">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-                <p className="text-sm text-gray-500 mt-1">Fill in the details to list your product.</p>
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+                    <p className="text-sm text-gray-500 mt-0.5">Update your product details.</p>
+                </div>
+                <button onClick={handleDelete} disabled={deleting}
+                    className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-60 transition">
+                    {deleting ? 'Deleting…' : 'Delete'}
+                </button>
             </div>
 
             {error && (
@@ -75,11 +114,9 @@ export default function NewProductPage() {
             )}
 
             <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
                     <input name="product_name" type="text" required value={form.product_name} onChange={handleChange}
-                        placeholder="e.g. Wireless Earbuds"
                         className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                 </div>
 
@@ -87,7 +124,6 @@ export default function NewProductPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                     <select name="category_id" required value={form.category_id} onChange={handleChange}
                         className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white">
-                        <option value="">Select a category</option>
                         {categories.map(c => (
                             <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
                         ))}
@@ -98,13 +134,11 @@ export default function NewProductPage() {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Price (₱) *</label>
                         <input name="price" type="number" required min="0" step="0.01" value={form.price} onChange={handleChange}
-                            placeholder="0.00"
                             className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
                         <input name="stock" type="number" min="0" value={form.stock} onChange={handleChange}
-                            placeholder="0"
                             className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                     </div>
                 </div>
@@ -122,14 +156,13 @@ export default function NewProductPage() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                     <textarea name="description" rows={4} value={form.description} onChange={handleChange}
-                        placeholder="Describe your product…"
                         className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition resize-none" />
                 </div>
 
                 <div className="flex gap-3 pt-2">
                     <button type="submit" disabled={loading}
                         className="flex-1 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition">
-                        {loading ? 'Saving…' : 'Add Product'}
+                        {loading ? 'Saving…' : 'Save Changes'}
                     </button>
                     <a href="/seller/dashboard"
                         className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">

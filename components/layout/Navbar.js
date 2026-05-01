@@ -36,7 +36,7 @@ export default async function Navbar() {
 
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <span className="text-xl font-extrabold tracking-tight text-indigo-600">ShopEasy</span>
+                    <span className="text-xl font-extrabold tracking-tight text-indigo-600">Lazapee</span>
                 </Link>
 
                 {/* Search */}

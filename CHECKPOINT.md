@@ -274,11 +274,11 @@ node --env-file=.env.local migrate_cart_orders.js   # 4. cart_items + order_item
 
 ---
 
-## 🌟 Future Enhancements
+## 🌟 Future Enhancements (Completed)
 
-- Cloudinary image upload (replace URL-only for product images)
-- Real-time chat (buyer ↔ seller)
-- Wishlist, discount codes & vouchers
-- Payment gateway (GCash, PayPal)
-- Admin: user role promotion / ban
+- [x] **Cloudinary Image Upload**: Added `cloudinary` npm package and `/api/upload` route for sellers to upload product images. Form inputs updated to support file streaming.
+- [x] **Admin Role Promotion**: Implemented `PUT /api/admin/users/[id]/role` and added `UserRoleSelect` to the Admin dashboard for instant role modifications.
+- [x] **Payment Gateway Integration**: Simulated GCash/PayPal checkout flow (`/checkout/[id]`) with `/api/payments/[id]/complete` processing logic. Order and payment tables accurately reflect 'paid' status.
+- [ ] Real-time chat (buyer ↔ seller)
+- [ ] Wishlist, discount codes & vouchers
 - Mobile app version

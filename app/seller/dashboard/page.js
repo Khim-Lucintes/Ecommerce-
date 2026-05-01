@@ -4,7 +4,7 @@ import { getStoreByOwner, getProductsByStore, getOrdersByStore } from '@/service
 import CreateStoreForm from '@/components/seller/CreateStoreForm';
 import Link from 'next/link';
 
-export const metadata = { title: 'Seller Dashboard — ShopEasy' };
+export const metadata = { title: 'Seller Dashboard — Lazapee' };
 
 const STATUS_COLORS = {
     pending:   'bg-yellow-100 text-yellow-700',
