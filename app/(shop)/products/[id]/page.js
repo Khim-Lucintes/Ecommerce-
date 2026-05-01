@@ -4,7 +4,7 @@ import { isWishlisted } from '@/services/wishlist';
 import { cookies } from 'next/headers';
 import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
+
 import Link from 'next/link';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import ReviewList from '@/components/ui/ReviewList';
@@ -65,13 +65,10 @@ export default async function ProductDetailPage({ params }) {
                 {/* Product image */}
                 <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
                     {product.image_url ? (
-                        <Image
+                        <img
                             src={product.image_url}
                             alt={product.product_name}
-                            fill
-                            className="object-cover"
-                            priority
-                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="absolute inset-0 w-full h-full object-cover"
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center text-gray-300">

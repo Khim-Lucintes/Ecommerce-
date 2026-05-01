@@ -24,10 +24,6 @@ export async function POST(request) {
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
         if (!payload) return Response.json({ error: 'Login required' }, { status: 401 });
 
-        if (payload.role !== 'customer') {
-            return Response.json({ error: 'Only customers can add items to cart' }, { status: 403 });
-        }
-
         const { product_id, quantity } = await request.json();
         if (!product_id || !quantity) return Response.json({ error: 'Missing product or quantity' }, { status: 400 });
 

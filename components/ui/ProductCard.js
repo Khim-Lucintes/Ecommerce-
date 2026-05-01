@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -25,12 +25,10 @@ export default function ProductCard({ product }) {
                 {/* Product image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
                     {image_url ? (
-                        <Image
+                        <img
                             src={image_url}
                             alt={product_name}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center text-muted-foreground">

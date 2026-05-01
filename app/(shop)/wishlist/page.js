@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 import { getWishlist } from '@/services/wishlist';
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { redirect } from 'next/navigation';
 
 export const metadata = { title: 'My Wishlist — Lazapee' };
@@ -34,11 +34,10 @@ export default async function WishlistPage() {
                         >
                             <div className="relative aspect-square bg-gray-100 overflow-hidden">
                                 {item.image_url ? (
-                                    <Image
+                                    <img
                                         src={item.image_url}
                                         alt={item.product_name}
-                                        fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 ) : (
                                     <div className="flex h-full items-center justify-center text-4xl text-gray-200">📦</div>

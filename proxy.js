@@ -23,6 +23,13 @@ export function proxy(request) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
+    // Smart redirect for /dashboard
+    if (pathname === '/dashboard') {
+        if (payload?.role === 'admin') return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+        if (payload?.role === 'seller') return NextResponse.redirect(new URL('/seller/dashboard', request.url));
+        return NextResponse.redirect(new URL('/', request.url));
+    }
+
     // Check protected routes
     const isProtected = PROTECTED.some(p => pathname.startsWith(p));
     if (isProtected && !payload) {
@@ -43,6 +50,7 @@ export function proxy(request) {
 
 export const config = {
     matcher: [
+        '/dashboard',
         '/seller/:path*',
         '/admin/:path*',
         '/cart/:path*',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { useRouter } from 'next/navigation';
 import VoucherInput from '@/components/ui/VoucherInput';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,7 +101,7 @@ export default function CartPage() {
                                 <CardContent className="flex gap-4 p-4">
                                     <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-muted">
                                         {item.image_url ? (
-                                            <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
+                                            <img src={item.image_url} alt={item.product_name} className="absolute inset-0 w-full h-full object-cover" />
                                         ) : (
                                             <div className="flex h-full items-center justify-center text-muted-foreground text-2xl">📦</div>
                                         )}
