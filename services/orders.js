@@ -35,7 +35,7 @@ export async function createOrder(profile_id) {
         // 4. Insert items and deduct stock
         for (const item of items) {
             await conn.query(
-                'INSERT INTO order_items_table (order_id, product_id, quantity, price_at_time) VALUES (?, ?, ?, ?)',
+                'INSERT INTO order_items_table (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
                 [order_id, item.product_id, item.quantity, item.price]
             );
             await conn.query(

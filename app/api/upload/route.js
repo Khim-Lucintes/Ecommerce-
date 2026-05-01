@@ -29,19 +29,37 @@ export async function POST(request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Upload to Cloudinary using streams
-        const result = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: 'ecommerce_products' },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-            uploadStream.end(buffer);
-        });
+        // Upload to Cloudinary if configured
+        if (process.env.CLOUDINARY_CLOUD_NAME) {
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'ecommerce_products' },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                uploadStream.end(buffer);
+            });
+            return Response.json({ url: result.secure_url }, { status: 201 });
+        } else {
+            // Fallback: save locally
+            const fs = await import('fs/promises');
+            const path = await import('path');
+            
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+            try {
+                await fs.mkdir(uploadDir, { recursive: true });
+            } catch (e) {}
 
-        return Response.json({ url: result.secure_url }, { status: 201 });
+            const ext = file.name.split('.').pop();
+            const fileName = `product_${Date.now()}_${Math.round(Math.random() * 1000)}.${ext}`;
+            const filePath = path.join(uploadDir, fileName);
+            
+            await fs.writeFile(filePath, buffer);
+            
+            return Response.json({ url: `/uploads/${fileName}` }, { status: 201 });
+        }
     } catch (error) {
         console.error('[Upload API Error]', error);
         return Response.json({ error: 'Image upload failed' }, { status: 500 });

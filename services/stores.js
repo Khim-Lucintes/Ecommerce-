@@ -27,7 +27,7 @@ export async function getProductsByStore(store_id) {
 export async function getOrdersByStore(store_id) {
     const [rows] = await pool.query(`
         SELECT o.order_id, o.status, o.created_at, 
-               oi.quantity, oi.price_at_time, 
+               oi.quantity, oi.price, 
                p.product_name, pr.full_name AS buyer_name
         FROM order_table o
         JOIN order_items_table oi ON o.order_id = oi.order_id
