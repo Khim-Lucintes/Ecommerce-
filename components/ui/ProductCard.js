@@ -12,6 +12,9 @@ export default function ProductCard({ product }) {
         image_url,
         store_name,
         category_name,
+        average_rating,
+        review_count,
+        sold_count,
     } = product;
 
     const formattedPrice = Number(price).toLocaleString('en-PH', {
@@ -53,7 +56,17 @@ export default function ProductCard({ product }) {
                         {product_name}
                     </h3>
                     <p className="text-xs text-muted-foreground truncate">{store_name}</p>
-                    <p className="mt-auto pt-2 text-base font-bold text-primary">{formattedPrice}</p>
+                    <div className="mt-auto pt-2">
+                        <p className="text-base font-bold text-primary">{formattedPrice}</p>
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1">
+                            <div className="flex items-center gap-1">
+                                <span className="text-amber-400">★</span>
+                                <span>{average_rating ? Number(average_rating).toFixed(1) : '0.0'}</span>
+                                <span>({review_count || 0})</span>
+                            </div>
+                            <span>{sold_count || 0} sold</span>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </Link>

@@ -63,3 +63,13 @@ export async function removeCartItem(cart_item_id) {
 export async function clearCart(cart_id) {
     await pool.query('DELETE FROM cart_items_table WHERE cart_id = ?', [cart_id]);
 }
+
+export async function getCartCount(profile_id) {
+    const [rows] = await pool.query(`
+        SELECT SUM(ci.quantity) as count
+        FROM cart_items_table ci
+        JOIN cart_table c ON ci.cart_id = c.cart_id
+        WHERE c.profile_id = ?
+    `, [profile_id]);
+    return Number(rows[0]?.count || 0);
+}

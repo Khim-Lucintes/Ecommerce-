@@ -3,14 +3,17 @@ import pool from '@/lib/db';
 /**
  * Get all products with store, category, first variant (price/stock), and first image.
  */
-export async function getProducts({ limit = 20, offset = 0, category_id, store_id } = {}) {
+export async function getProducts({ limit = 20, offset = 0, category_id, store_id, sort_by = 'latest' } = {}) {
     let sql = `
         SELECT
             p.product_id, p.product_name, p.description, p.created_at,
             s.store_id, s.store_name,
             c.category_id, c.category_name,
             v.price, v.stock,
-            i.image_url
+            i.image_url,
+            COALESCE(r.average_rating, 0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count,
+            COALESCE(o.sold_count, 0) as sold_count
         FROM product_table p
         JOIN store_table s ON p.store_id = s.store_id
         JOIN category_table c ON p.category_id = c.category_id
@@ -24,6 +27,18 @@ export async function getProducts({ limit = 20, offset = 0, category_id, store_i
             FROM product_image_table
             GROUP BY product_id
         ) i ON p.product_id = i.product_id
+        LEFT JOIN (
+            SELECT product_id, AVG(rating) as average_rating, COUNT(review_id) as review_count
+            FROM review_table
+            GROUP BY product_id
+        ) r ON p.product_id = r.product_id
+        LEFT JOIN (
+            SELECT oi.product_id, SUM(oi.quantity) as sold_count
+            FROM order_items_table oi
+            JOIN order_table ot ON oi.order_id = ot.order_id
+            WHERE ot.status != 'cancelled'
+            GROUP BY oi.product_id
+        ) o ON p.product_id = o.product_id
         WHERE 1=1
     `;
     const params = [];
@@ -31,7 +46,17 @@ export async function getProducts({ limit = 20, offset = 0, category_id, store_i
     if (category_id) { sql += ' AND p.category_id = ?'; params.push(category_id); }
     if (store_id)    { sql += ' AND p.store_id = ?';    params.push(store_id); }
 
-    sql += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
+    if (sort_by === 'price_asc') {
+        sql += ' ORDER BY v.price ASC';
+    } else if (sort_by === 'price_desc') {
+        sql += ' ORDER BY v.price DESC';
+    } else if (sort_by === 'top_sales') {
+        sql += ' ORDER BY sold_count DESC';
+    } else {
+        sql += ' ORDER BY p.created_at DESC';
+    }
+
+    sql += ' LIMIT ? OFFSET ?';
     params.push(limit, offset);
 
     const [rows] = await pool.query(sql, params);
@@ -48,7 +73,10 @@ export async function getProductById(id) {
             s.store_id, s.store_name, s.owner_id,
             c.category_id, c.category_name,
             v.price, v.stock,
-            i.image_url
+            i.image_url,
+            COALESCE(r.average_rating, 0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count,
+            COALESCE(o.sold_count, 0) as sold_count
          FROM product_table p
          JOIN store_table s ON p.store_id = s.store_id
          JOIN category_table c ON p.category_id = c.category_id
@@ -64,9 +92,22 @@ export async function getProductById(id) {
              WHERE product_id = ?
              GROUP BY product_id
          ) i ON p.product_id = i.product_id
+         LEFT JOIN (
+             SELECT product_id, AVG(rating) as average_rating, COUNT(review_id) as review_count
+             FROM review_table
+             WHERE product_id = ?
+             GROUP BY product_id
+         ) r ON p.product_id = r.product_id
+         LEFT JOIN (
+             SELECT oi.product_id, SUM(oi.quantity) as sold_count
+             FROM order_items_table oi
+             JOIN order_table ot ON oi.order_id = ot.order_id
+             WHERE oi.product_id = ? AND ot.status != 'cancelled'
+             GROUP BY oi.product_id
+         ) o ON p.product_id = o.product_id
          WHERE p.product_id = ?
          LIMIT 1`,
-        [id, id, id]
+        [id, id, id, id, id]
     );
     return rows[0] || null;
 }

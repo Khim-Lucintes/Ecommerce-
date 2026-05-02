@@ -61,3 +61,11 @@ export async function getConversations(userId) {
     );
     return rows;
 }
+
+export async function getUnreadMessageCount(userId) {
+    const [rows] = await pool.query(
+        'SELECT COUNT(*) as count FROM messages_table WHERE receiver_id = ? AND is_read = FALSE',
+        [userId]
+    );
+    return Number(rows[0]?.count || 0);
+}

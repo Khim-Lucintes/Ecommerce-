@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
-export default function NavbarActions({ user }) {
+export default function NavbarActions({ user, cartCount = 0, unreadMessages = 0 }) {
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -60,10 +60,29 @@ export default function NavbarActions({ user }) {
                     </svg>
                 </Link>
             )}
-            <Link href="/cart" className={buttonVariants({ variant: 'ghost', size: 'icon' })}>
+            
+            {user && (
+                <Link href="/messages" className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "relative")}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    {unreadMessages > 0 && (
+                        <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-1 ring-white">
+                            {unreadMessages > 99 ? '99+' : unreadMessages}
+                        </span>
+                    )}
+                </Link>
+            )}
+
+            <Link href="/cart" className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "relative")}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
+                {cartCount > 0 && (
+                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-1 ring-white">
+                        {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                )}
             </Link>
             
             <div className="flex items-center gap-2 ml-2 pl-2 border-l border-border">

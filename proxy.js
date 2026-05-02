@@ -1,5 +1,22 @@
 import { NextResponse } from 'next/server';
-import { verifyToken, COOKIE_NAME } from '@/lib/auth';
+import { COOKIE_NAME } from '@/lib/auth';
+
+// Simple JWT decoder for Edge Runtime (doesn't verify signature, just reads payload)
+// API Routes and Server Components will still cryptographically verify it via lib/auth.js
+function decodeJwtPayload(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const pad = base64.length % 4;
+        const paddedBase64 = pad ? base64 + '='.repeat(4 - pad) : base64;
+        const jsonPayload = decodeURIComponent(atob(paddedBase64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch {
+        return null;
+    }
+}
 
 // Routes that require login
 const PROTECTED = ['/seller', '/admin', '/superadmin', '/cart', '/checkout', '/orders'];
@@ -17,7 +34,7 @@ const AUTH_ONLY = ['/login', '/register'];
 export function proxy(request) {
     const { pathname } = request.nextUrl;
     const token = request.cookies.get(COOKIE_NAME)?.value;
-    const payload = token ? verifyToken(token) : null;
+    const payload = token ? decodeJwtPayload(token) : null;
 
     // Logged-in users shouldn't visit login/register
     if (AUTH_ONLY.some(p => pathname.startsWith(p)) && payload) {

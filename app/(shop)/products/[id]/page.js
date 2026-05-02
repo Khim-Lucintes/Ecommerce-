@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 
 import Link from 'next/link';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import BuyNowButton from '@/components/ui/BuyNowButton';
 import ReviewList from '@/components/ui/ReviewList';
 import ReviewSection from '@/components/ui/ReviewSection';
 import WishlistButton from '@/components/ui/WishlistButton';
@@ -119,7 +120,8 @@ export default async function ProductDetailPage({ params }) {
 
                     {/* Actions: Add to Cart + Wishlist */}
                     <div className="mt-8 flex gap-3">
-                        <div className="flex-1">
+                        <div className="flex flex-1 flex-col gap-3">
+                            <BuyNowButton productId={product.product_id} stock={product.stock} />
                             <AddToCartButton productId={product.product_id} stock={product.stock} />
                         </div>
                         <WishlistButton productId={product.product_id} initialWishlisted={wishlisted} />

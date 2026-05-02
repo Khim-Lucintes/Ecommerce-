@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 import pool from '@/lib/db';
+import { getCartCount } from '@/services/cart';
+import { getUnreadMessageCount } from '@/services/chat';
 import NavbarActions from './NavbarActions';
 import { Input } from '@/components/ui/input';
 
@@ -30,6 +32,8 @@ async function getCurrentUser() {
 
 export default async function Navbar() {
     const user = await getCurrentUser();
+    const cartCount = user ? await getCartCount(user.id) : 0;
+    const unreadMessages = user ? await getUnreadMessageCount(user.id) : 0;
 
     return (
         <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
@@ -58,7 +62,7 @@ export default async function Navbar() {
                 </form>
 
                 {/* Auth actions — client component for interactivity */}
-                <NavbarActions user={user} />
+                <NavbarActions user={user} cartCount={cartCount} unreadMessages={unreadMessages} />
             </div>
         </header>
     );

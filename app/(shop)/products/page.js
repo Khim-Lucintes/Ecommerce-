@@ -1,6 +1,7 @@
 import { getProducts } from '@/services/products';
 import { getCategories } from '@/services/categories';
 import ProductCard from '@/components/ui/ProductCard';
+import ProductSortSelect from '@/components/ui/ProductSortSelect';
 import Link from 'next/link';
 
 export const metadata = {
@@ -11,9 +12,10 @@ export const metadata = {
 export default async function ProductsPage({ searchParams }) {
     const query = await searchParams;
     const category_id = query.category_id ? Number(query.category_id) : undefined;
+    const sort_by = query.sort_by || 'latest';
 
     const [products, categories] = await Promise.all([
-        getProducts({ category_id, limit: 24 }),
+        getProducts({ category_id, sort_by, limit: 24 }),
         getCategories(),
     ]);
 
@@ -21,9 +23,12 @@ export default async function ProductsPage({ searchParams }) {
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
             {/* Page header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">All Products</h1>
-                <p className="text-sm text-gray-500 mt-1">{products.length} item{products.length !== 1 ? 's' : ''} found</p>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">All Products</h1>
+                    <p className="text-sm text-gray-500 mt-1">{products.length} item{products.length !== 1 ? 's' : ''} found</p>
+                </div>
+                <ProductSortSelect />
             </div>
 
             <div className="flex flex-col gap-8 lg:flex-row">

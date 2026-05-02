@@ -24,6 +24,10 @@ export default async function SellerLayout({ children }) {
                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
                         ➕ Add Product
                     </a>
+                    <a href="/seller/dashboard/messages"
+                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
+                        💬 Messages
+                    </a>
                     <a href="/products"
                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition font-medium">
                         🛍️ View Shop
