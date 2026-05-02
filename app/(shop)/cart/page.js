@@ -5,18 +5,20 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import VoucherInput from '@/components/ui/VoucherInput';
+import AddressSelector from '@/components/ui/AddressSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function CartPage() {
     const router = useRouter();
-    const [items, setItems]         = useState([]);
-    const [total, setTotal]         = useState('0.00');
-    const [loading, setLoading]     = useState(true);
-    const [checking, setChecking]   = useState(false);
-    const [error, setError]         = useState('');
-    const [voucher, setVoucher]     = useState(null); // { discount, final_total, ... }
+    const [items, setItems]           = useState([]);
+    const [total, setTotal]           = useState('0.00');
+    const [loading, setLoading]       = useState(true);
+    const [checking, setChecking]     = useState(false);
+    const [error, setError]           = useState('');
+    const [voucher, setVoucher]       = useState(null); // { discount, final_total, ... }
+    const [selectedAddress, setSelectedAddress] = useState(null);
 
     const fetchCart = useCallback(async () => {
         try {
@@ -50,10 +52,18 @@ export default function CartPage() {
     };
 
     const checkout = async () => {
+        if (!selectedAddress) {
+            setError('Please select or add a delivery address before checking out.');
+            return;
+        }
         setChecking(true);
         setError('');
         try {
-            const res = await fetch('/api/orders', { method: 'POST' });
+            const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address_id: selectedAddress }),
+            });
             const data = await res.json();
             if (!res.ok) { setError(data.error || 'Checkout failed.'); }
             else { router.push(`/checkout/${data.order_id}`); }
@@ -133,6 +143,14 @@ export default function CartPage() {
                             <CardTitle className="text-base">Order Summary</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                            {/* Delivery address */}
+                            <AddressSelector
+                                selectedId={selectedAddress}
+                                onSelect={setSelectedAddress}
+                            />
+
+                            <div className="border-t pt-3" />
+
                             {/* Voucher input */}
                             <div className="relative">
                                 <VoucherInput cartTotal={cartTotal} onApply={setVoucher} />

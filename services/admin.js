@@ -26,11 +26,16 @@ export async function getAllUsers() {
 
 export async function getAllProducts() {
     const [rows] = await pool.query(`
-        SELECT p.product_id, p.product_name, p.price, p.stock, p.created_at,
+        SELECT p.product_id, p.product_name, v.price, v.stock, p.created_at,
                c.category_name, s.store_name
         FROM product_table p
         JOIN category_table c ON p.category_id = c.category_id
         JOIN store_table s ON p.store_id = s.store_id
+        LEFT JOIN (
+            SELECT product_id, MIN(price) as price, SUM(stock) as stock
+            FROM product_variant_table
+            GROUP BY product_id
+        ) v ON p.product_id = v.product_id
         ORDER BY p.created_at DESC
     `);
     return rows;

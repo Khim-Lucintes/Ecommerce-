@@ -16,13 +16,22 @@ export async function GET() {
     }
 }
 
-export async function POST() {
+export async function POST(request) {
     try {
         const cookieStore = await cookies();
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
         if (!payload) return Response.json({ error: 'Login required' }, { status: 401 });
 
-        const order_id = await createOrder(payload.id);
+        // address_id is optional — orders can still be placed without one
+        let address_id = null;
+        try {
+            const body = await request.json();
+            address_id = body?.address_id || null;
+        } catch {
+            // no body / not JSON — fine, proceed without address
+        }
+
+        const order_id = await createOrder(payload.id, address_id);
         return Response.json({ message: 'Order placed', order_id }, { status: 201 });
     } catch (err) {
         console.error('[POST /api/orders]', err);

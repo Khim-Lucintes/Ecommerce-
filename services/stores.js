@@ -15,9 +15,19 @@ export async function createStore(profile_id, store_name, description = '') {
 
 export async function getProductsByStore(store_id) {
     const [rows] = await pool.query(`
-        SELECT p.*, c.category_name 
+        SELECT p.*, c.category_name, v.price, v.stock, i.image_url
         FROM product_table p
         JOIN category_table c ON p.category_id = c.category_id
+        LEFT JOIN (
+            SELECT product_id, MIN(price) as price, SUM(stock) as stock
+            FROM product_variant_table
+            GROUP BY product_id
+        ) v ON p.product_id = v.product_id
+        LEFT JOIN (
+            SELECT product_id, MAX(image_url) as image_url
+            FROM product_image_table
+            GROUP BY product_id
+        ) i ON p.product_id = i.product_id
         WHERE p.store_id = ?
         ORDER BY p.created_at DESC
     `, [store_id]);
