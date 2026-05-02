@@ -8,7 +8,7 @@ export async function PUT(request, { params }) {
         const cookieStore = await cookies();
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
 
-        if (!payload || payload.role !== 'admin') {
+        if (!payload || (payload.role !== 'admin' && payload.role !== 'superadmin')) {
             return Response.json({ error: 'Admin access required' }, { status: 403 });
         }
 

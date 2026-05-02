@@ -43,6 +43,11 @@ export default function NavbarActions({ user }) {
                     My Store
                 </Link>
             )}
+            {user.role === 'superadmin' && (
+                <Link href="/superadmin/dashboard" className={cn(buttonVariants({ variant: 'ghost' }), "hidden sm:flex")}>
+                    Superadmin
+                </Link>
+            )}
             {user.role === 'admin' && (
                 <Link href="/admin/dashboard" className={cn(buttonVariants({ variant: 'ghost' }), "hidden sm:flex")}>
                     Admin
@@ -79,6 +84,11 @@ export default function NavbarActions({ user }) {
                         <DropdownMenuItem render={<Link href="/settings" />}>
                             <div className="cursor-pointer w-full">
                                 Profile & Settings
+                            </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem render={<Link href="/orders" />}>
+                            <div className="cursor-pointer w-full">
+                                Purchase History
                             </div>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

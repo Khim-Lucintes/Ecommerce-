@@ -7,12 +7,14 @@ const ROLE_MAP = {
     admin: 1,
     seller: 2,
     customer: 3,
+    superadmin: 4,
 };
 
 const ROLE_COLORS = {
     admin:    'bg-red-100 text-red-700',
     seller:   'bg-violet-100 text-violet-700',
     customer: 'bg-blue-100 text-blue-700',
+    superadmin: 'bg-indigo-100 text-indigo-700 font-bold',
 };
 
 export default function UserRoleSelect({ userId, currentRole }) {
@@ -52,6 +54,7 @@ export default function UserRoleSelect({ userId, currentRole }) {
             disabled={loading}
             className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize outline-none cursor-pointer transition ${ROLE_COLORS[currentRole] || 'bg-gray-100 text-gray-700'} ${loading ? 'opacity-50' : ''}`}
         >
+            <option value="superadmin">Superadmin</option>
             <option value="admin">Admin</option>
             <option value="seller">Seller</option>
             <option value="customer">Customer</option>

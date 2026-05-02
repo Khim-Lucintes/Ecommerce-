@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function CheckoutPaymentPage({ params }) {
     const router = useRouter();
@@ -29,6 +30,7 @@ export default function CheckoutPaymentPage({ params }) {
                 return;
             }
             // Payment success — redirect to order confirmation
+            toast.success('Payment successful! Your order has been placed. 🎉');
             router.push(`/orders/${orderId}`);
         } catch {
             setError('Network error during payment.');

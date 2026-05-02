@@ -2,6 +2,7 @@ import { Geist } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import ConditionalLayoutWrapper from '@/components/layout/ConditionalLayoutWrapper';
+import { Toaster } from '@/components/ui/sonner';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
                         © {new Date().getFullYear()} Lazapee. School Project.
                     </footer>
                 </ConditionalLayoutWrapper>
+                <Toaster richColors position="top-center" />
             </body>
         </html>
     );

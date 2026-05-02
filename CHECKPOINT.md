@@ -33,7 +33,7 @@
 
 | Domain | Table | Notes |
 |---|---|---|
-| User & Access | `role_table` | Seeded: admin(1), seller(2), customer(3) |
+| User & Access | `role_table` | Seeded: admin(1), seller(2), customer(3), superadmin(4) |
 | User & Access | `profile_table` | — |
 | Seller / Store | `store_table` | — |
 | Product Catalog | `category_table` | Seeded via `seed_categories.js` |
@@ -259,7 +259,9 @@ ecommerce-system/
 │   ├── admin/dashboard/
 │   │   ├── layout.js                                 ✅ Auth guard + sidebar
 │   │   └── page.js                                   ✅ Stats + users + products + orders + vouchers
-│   ├── orders/[id]/page.js                           ✅ Order confirmation (Phase 8)
+│   ├── orders/
+│   │   ├── page.js                                   ✅ Purchase History list
+│   │   └── [id]/page.js                              ✅ Order confirmation
 │   ├── settings/page.js                              ✅ Profile info + seller upgrade
 │   ├── api/
 │   │   ├── addresses/
@@ -290,7 +292,7 @@ ecommerce-system/
 │   │   ├── vouchers/apply/route.js                   ✅
 │   │   └── wishlist/route.js                         ✅
 │   ├── globals.css                                   ✅ Tailwind v4 + Lazapee Indigo theme
-│   ├── layout.js                                     ✅ Navbar + footer + PWA meta
+│   ├── layout.js                                     ✅ Navbar + footer + PWA meta + Toaster
 │   └── page.js                                       ✅ Home page
 │
 ├── components/
@@ -350,7 +352,9 @@ ecommerce-system/
 ├── seed_admin.js                                     ✅ run once
 ├── seed_categories.js                                ✅ run once
 ├── seed_roles.js                                     ✅ run once
+├── seed_superadmin.js                                ✅ run once
 ├── setup_db.js                                       ✅ DDL bootstrap
+├── drop_columns.js                                   ✅ Drops old schema columns
 ├── AGENTS.md                                         ✅ AI agent skill file
 ├── CHECKPOINT.md                                     ✅ This file
 ├── ecommerce_schema.md                               📄 Old schema reference
@@ -386,6 +390,8 @@ node --env-file=.env.local migrate_cart_orders.js   # 6. cart_items + order_item
 node --env-file=.env.local migrate_phase7.js        # 7. messages + wishlist + vouchers tables
 node --env-file=.env.local migrate_new_schema.js    # 8. new schema tables (Phase 8)
 node --env-file=.env.local alter_shipment_table.js  # 9. address_id + timestamps on shipment
+node --env-file=.env.local drop_columns.js          # 10. drops price/stock/image from product_table
+node --env-file=.env.local seed_superadmin.js       # 11. seeds superadmin role and account
 ```
 
 ---
@@ -430,7 +436,10 @@ node --env-file=.env.local alter_shipment_table.js  # 9. address_id + timestamps
 | Seller dashboard (products & orders) | Phase 5 |
 | Admin dashboard (users, products, orders) | Phase 5 |
 | Admin role promotion | Phase 5 |
+| Superadmin Role & Access | Phase 8 |
 | Admin voucher management | Phase 7 |
 | Seller upgrade (customer → seller via settings) | Phase 5 |
+| Purchase History Page | Phase 8 |
+| Toast Notifications (sonner) | Phase 8 |
 | Progressive Web App (PWA manifest) | Phase 7 |
 | Lazapee brand + shadcn/ui design system | Phase 7 |

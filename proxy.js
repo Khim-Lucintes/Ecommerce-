@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 
 // Routes that require login
-const PROTECTED = ['/seller', '/admin', '/cart', '/checkout', '/orders'];
+const PROTECTED = ['/seller', '/admin', '/superadmin', '/cart', '/checkout', '/orders'];
 
 // Routes that require a specific role
 const ROLE_ROUTES = {
     '/seller': 'seller',
     '/admin':  'admin',
+    '/superadmin': 'superadmin',
 };
 
 // Redirect logged-in users away from auth pages
@@ -25,6 +26,7 @@ export function proxy(request) {
 
     // Smart redirect for /dashboard
     if (pathname === '/dashboard') {
+        if (payload?.role === 'superadmin') return NextResponse.redirect(new URL('/superadmin/dashboard', request.url));
         if (payload?.role === 'admin') return NextResponse.redirect(new URL('/admin/dashboard', request.url));
         if (payload?.role === 'seller') return NextResponse.redirect(new URL('/seller/dashboard', request.url));
         return NextResponse.redirect(new URL('/', request.url));
@@ -40,8 +42,13 @@ export function proxy(request) {
 
     // Check role-restricted routes
     for (const [route, requiredRole] of Object.entries(ROLE_ROUTES)) {
-        if (pathname.startsWith(route) && payload?.role !== requiredRole) {
-            return NextResponse.redirect(new URL('/', request.url));
+        if (pathname.startsWith(route)) {
+            if (requiredRole === 'admin' && (payload?.role === 'admin' || payload?.role === 'superadmin')) {
+                continue; // Superadmin can access admin routes
+            }
+            if (payload?.role !== requiredRole) {
+                return NextResponse.redirect(new URL('/', request.url));
+            }
         }
     }
 
@@ -53,6 +60,7 @@ export const config = {
         '/dashboard',
         '/seller/:path*',
         '/admin/:path*',
+        '/superadmin/:path*',
         '/cart/:path*',
         '/checkout/:path*',
         '/orders/:path*',

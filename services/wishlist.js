@@ -3,12 +3,23 @@ import pool from '@/lib/db';
 export async function getWishlist(profile_id) {
     const [rows] = await pool.query(
         `SELECT w.wishlist_id, w.created_at,
-                p.product_id, p.product_name, p.price, p.image_url, p.stock,
+                p.product_id, p.product_name, 
+                v.price, v.stock, i.image_url,
                 c.category_name, s.store_name
          FROM wishlist_table w
          JOIN product_table p ON w.product_id = p.product_id
          JOIN category_table c ON p.category_id = c.category_id
          JOIN store_table s ON p.store_id = s.store_id
+         LEFT JOIN (
+             SELECT product_id, MIN(price) as price, SUM(stock) as stock
+             FROM product_variant_table
+             GROUP BY product_id
+         ) v ON p.product_id = v.product_id
+         LEFT JOIN (
+             SELECT product_id, MAX(image_url) as image_url
+             FROM product_image_table
+             GROUP BY product_id
+         ) i ON p.product_id = i.product_id
          WHERE w.profile_id = ?
          ORDER BY w.created_at DESC`,
         [profile_id]

@@ -46,6 +46,28 @@ export async function POST(request, { params }) {
                 [Number(id)]
             );
 
+            // Notify sellers via chat
+            const [orderItems] = await conn.query(`
+                SELECT oi.product_id, p.product_name, s.owner_id
+                FROM order_items_table oi
+                JOIN product_table p ON oi.product_id = p.product_id
+                JOIN store_table s ON p.store_id = s.store_id
+                WHERE oi.order_id = ?
+            `, [Number(id)]);
+
+            for (const item of orderItems) {
+                // Send automated message from buyer to seller
+                await conn.query(
+                    'INSERT INTO messages_table (sender_id, receiver_id, content, product_id) VALUES (?, ?, ?, ?)',
+                    [
+                        payload.id,
+                        item.owner_id,
+                        `🛒 **Order Placed**: I just purchased **${item.product_name}**! (Order #${id})`,
+                        item.product_id
+                    ]
+                );
+            }
+
             await conn.commit();
             return Response.json({ message: 'Payment successful' });
         } catch (err) {

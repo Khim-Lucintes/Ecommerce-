@@ -36,7 +36,7 @@ export default async function SellerDashboardPage() {
 
     const totalRevenue = orders
         .filter(o => o.status !== 'cancelled')
-        .reduce((s, o) => s + Number(o.total_amount), 0);
+        .reduce((s, o) => s + (Number(o.price) * Number(o.quantity)), 0);
 
     return (
         <div className="space-y-8 max-w-5xl">
@@ -159,7 +159,7 @@ export default async function SellerDashboardPage() {
                                         <TableCell className="pl-6 font-medium">#{o.order_id}</TableCell>
                                         <TableCell className="text-muted-foreground truncate max-w-[150px]">{o.buyer_name}</TableCell>
                                         <TableCell className="text-right font-semibold">
-                                            ₱{Number(o.total_amount).toLocaleString()}
+                                            ₱{(Number(o.price) * Number(o.quantity)).toLocaleString()}
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge variant="secondary" className={`capitalize ${STATUS_COLORS[o.status] || ''}`}>

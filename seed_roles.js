@@ -1,7 +1,7 @@
 // seed_roles.js — Run once: node --env-file=.env.local seed_roles.js
 const mysql = require('mysql2/promise');
 
-const ROLES = ['admin', 'seller', 'customer'];
+const ROLES = ['admin', 'seller', 'customer', 'superadmin'];
 
 async function main() {
     const pool = mysql.createPool({
