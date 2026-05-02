@@ -6,7 +6,7 @@ export async function GET() {
     try {
         const cookieStore = await cookies();
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
-        if (!payload || payload.role !== 'admin') {
+        if (!payload || (payload.role !== 'admin' && payload.role !== 'superadmin')) {
             return Response.json({ error: 'Admin access required' }, { status: 403 });
         }
         const vouchers = await getAllVouchers();
@@ -20,7 +20,7 @@ export async function POST(request) {
     try {
         const cookieStore = await cookies();
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
-        if (!payload || payload.role !== 'admin') {
+        if (!payload || (payload.role !== 'admin' && payload.role !== 'superadmin')) {
             return Response.json({ error: 'Admin access required' }, { status: 403 });
         }
         const body = await request.json();
@@ -35,7 +35,7 @@ export async function PATCH(request) {
     try {
         const cookieStore = await cookies();
         const payload = verifyToken(cookieStore.get(COOKIE_NAME)?.value);
-        if (!payload || payload.role !== 'admin') {
+        if (!payload || (payload.role !== 'admin' && payload.role !== 'superadmin')) {
             return Response.json({ error: 'Admin access required' }, { status: 403 });
         }
         const { voucher_id, is_active } = await request.json();

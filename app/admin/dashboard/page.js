@@ -47,10 +47,10 @@ export default async function AdminDashboardPage() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
-                    { label: 'Total Users',    value: stats.users,    icon: <Users className="h-6 w-6 text-blue-600" />, bgColor: 'bg-blue-50', color: 'text-blue-900' },
-                    { label: 'Total Products', value: stats.products, icon: <Package className="h-6 w-6 text-violet-600" />, bgColor: 'bg-violet-50', color: 'text-violet-900' },
-                    { label: 'Total Orders',   value: stats.orders,   icon: <ShoppingCart className="h-6 w-6 text-indigo-600" />, bgColor: 'bg-indigo-50', color: 'text-indigo-900' },
-                    { label: 'Total Revenue',  value: `₱${Number(stats.revenue).toLocaleString()}`, icon: <Banknote className="h-6 w-6 text-green-600" />, bgColor: 'bg-green-50', color: 'text-green-900' },
+                    { label: 'Total Users',    value: stats.total_users,    icon: <Users className="h-6 w-6 text-blue-600" />, bgColor: 'bg-blue-50', color: 'text-blue-900' },
+                    { label: 'Total Products', value: stats.total_products, icon: <Package className="h-6 w-6 text-violet-600" />, bgColor: 'bg-violet-50', color: 'text-violet-900' },
+                    { label: 'Total Orders',   value: stats.total_orders,   icon: <ShoppingCart className="h-6 w-6 text-indigo-600" />, bgColor: 'bg-indigo-50', color: 'text-indigo-900' },
+                    { label: 'Total Revenue',  value: `₱${Number(stats.total_sales).toLocaleString()}`, icon: <Banknote className="h-6 w-6 text-green-600" />, bgColor: 'bg-green-50', color: 'text-green-900' },
                 ].map(stat => (
                     <Card key={stat.label} className="overflow-hidden border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 group">
                         <CardContent className="p-6">

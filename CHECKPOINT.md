@@ -262,6 +262,9 @@ ecommerce-system/
 │   ├── orders/
 │   │   ├── page.js                                   ✅ Purchase History list
 │   │   └── [id]/page.js                              ✅ Order confirmation
+│   ├── superadmin/dashboard/
+│   │   ├── layout.js                                 ✅ Auth guard + sidebar
+│   │   └── page.js                                   ✅ Stats + platform management
 │   ├── settings/page.js                              ✅ Profile info + seller upgrade
 │   ├── api/
 │   │   ├── addresses/
@@ -435,9 +438,9 @@ node --env-file=.env.local seed_superadmin.js       # 11. seeds superadmin role 
 | Real-time chat — buyer ↔ seller (3s polling) | Phase 7 |
 | Seller dashboard (products & orders) | Phase 5 |
 | Admin dashboard (users, products, orders) | Phase 5 |
-| Admin role promotion | Phase 5 |
-| Superadmin Role & Access | Phase 8 |
-| Admin voucher management | Phase 7 |
+| Admin & Superadmin role promotion | Phase 5 |
+| Superadmin Role & Dashboard Parity | Phase 8 |
+| Admin & Superadmin voucher management | Phase 7 |
 | Seller upgrade (customer → seller via settings) | Phase 5 |
 | Purchase History Page | Phase 8 |
 | Toast Notifications (sonner) | Phase 8 |
