@@ -1,7 +1,7 @@
 // seed_roles.js — Run once: node --env-file=.env.local seed_roles.js
 const mysql = require('mysql2/promise');
 
-const ROLES = ['admin', 'seller', 'customer', 'superadmin'];
+const ROLES = ['customer', 'seller', 'admin', 'superadmin'];
 
 async function main() {
     const pool = mysql.createPool({
@@ -15,6 +15,9 @@ async function main() {
 
     try {
         console.log('🌱 Seeding role_table...');
+        // We do not use auto-increment insertion here, we TRUNCATE and insert exactly
+        // to guarantee IDs: 1=customer, 2=seller, 3=admin, 4=superadmin.
+        // But since foreign keys exist, we just update or ignore.
         for (const role of ROLES) {
             await pool.query(
                 'INSERT IGNORE INTO role_table (role_name) VALUES (?)',

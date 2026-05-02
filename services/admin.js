@@ -14,13 +14,43 @@ export async function getAdminStats() {
     };
 }
 
-export async function getAllUsers() {
+export async function getSalesAnalytics() {
+    const [rows] = await pool.query(`
+        SELECT DATE(created_at) as raw_date, SUM(total_amount) as revenue, COUNT(order_id) as orders
+        FROM order_table
+        WHERE status != 'cancelled' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        GROUP BY DATE(created_at)
+        ORDER BY raw_date ASC
+    `);
+
+    const analytics = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        const match = rows.find(r => {
+            const rDate = new Date(r.raw_date);
+            return new Date(rDate.getTime() - rDate.getTimezoneOffset() * 60000).toISOString().split('T')[0] === dateStr;
+        });
+
+        analytics.push({
+            date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            revenue: match ? Number(match.revenue) : 0,
+            orders: match ? Number(match.orders) : 0
+        });
+    }
+    return analytics;
+}
+
+export async function getAllUsers(limit = 50) {
     const [rows] = await pool.query(`
         SELECT p.profile_id, p.full_name, p.email, p.created_at, r.role_name
         FROM profile_table p
         JOIN role_table r ON p.role_id = r.role_id
         ORDER BY p.created_at DESC
-    `);
+        LIMIT ?
+    `, [limit]);
     return rows;
 }
 

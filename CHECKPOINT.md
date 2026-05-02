@@ -33,7 +33,7 @@
 
 | Domain | Table | Notes |
 |---|---|---|
-| User & Access | `role_table` | Seeded: admin(1), seller(2), customer(3), superadmin(4) |
+| User & Access | `role_table` | Seeded: customer(1), seller(2), admin(3), superadmin(4) |
 | User & Access | `profile_table` | — |
 | Seller / Store | `store_table` | — |
 | Product Catalog | `category_table` | Seeded via `seed_categories.js` |

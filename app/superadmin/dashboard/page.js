@@ -1,5 +1,6 @@
-import { getAdminStats, getAllUsers, getAllProducts, getAllOrders } from '@/services/admin';
-import UserRoleSelect from '@/components/admin/UserRoleSelect';
+import { getAdminStats, getAllUsers, getAllProducts, getAllOrders, getSalesAnalytics } from '@/services/admin';
+import UsersTableClient from '@/components/admin/UsersTableClient';
+import SalesChart from '@/components/admin/SalesChart';
 import VoucherManagement from '@/components/admin/VoucherManagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,11 +18,12 @@ const STATUS_COLORS = {
 };
 
 export default async function SuperadminDashboardPage() {
-    const [stats, users, products, orders] = await Promise.all([
+    const [stats, users, products, orders, analytics] = await Promise.all([
         getAdminStats(),
-        getAllUsers(50),
+        getAllUsers(500),
         getAllProducts(50),
         getAllOrders(50),
+        getSalesAnalytics(),
     ]);
 
     return (
@@ -62,40 +64,20 @@ export default async function SuperadminDashboardPage() {
                 ))}
             </div>
 
-            {/* Users table */}
-            <Card id="users" className="shadow-sm border-gray-100 overflow-hidden">
+            {/* Sales Chart */}
+            <Card className="shadow-sm border-gray-100 overflow-hidden mt-6">
                 <CardHeader className="bg-gray-50/80 border-b border-gray-100 pb-4">
                     <CardTitle className="text-lg font-bold flex items-center gap-2 text-gray-800">
-                        <Users className="w-5 h-5 text-gray-400" /> Users ({users.length})
+                        <Banknote className="w-5 h-5 text-green-600" /> Revenue & Order Trends (Last 7 Days)
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="px-0 py-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="pl-6">Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead className="text-center">Role</TableHead>
-                                <TableHead className="text-right pr-6">Joined</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {users.map(u => (
-                                <TableRow key={u.profile_id}>
-                                    <TableCell className="pl-6 font-medium">{u.full_name}</TableCell>
-                                    <TableCell className="text-muted-foreground">{u.email}</TableCell>
-                                    <TableCell className="text-center">
-                                        <UserRoleSelect userId={u.profile_id} currentRole={u.role_name} />
-                                    </TableCell>
-                                    <TableCell className="text-right pr-6 text-muted-foreground">
-                                        {new Date(u.created_at).toLocaleDateString()}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                <CardContent className="p-6">
+                    <SalesChart data={analytics} />
                 </CardContent>
             </Card>
+
+            {/* Users table */}
+            <UsersTableClient users={users} allowSuperadmin={true} />
 
             {/* Products table */}
             <Card id="products" className="shadow-sm border-gray-100 overflow-hidden">

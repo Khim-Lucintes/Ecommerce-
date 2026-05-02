@@ -1,5 +1,5 @@
 import { getAdminStats, getAllUsers, getAllProducts, getAllOrders } from '@/services/admin';
-import UserRoleSelect from '@/components/admin/UserRoleSelect';
+import UsersTableClient from '@/components/admin/UsersTableClient';
 import VoucherManagement from '@/components/admin/VoucherManagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -25,7 +25,7 @@ const ROLE_COLORS = {
 export default async function AdminDashboardPage() {
     const [stats, users, products, orders] = await Promise.all([
         getAdminStats(),
-        getAllUsers(50),
+        getAllUsers(500),
         getAllProducts(50),
         getAllOrders(50),
     ]);
@@ -40,17 +40,16 @@ export default async function AdminDashboardPage() {
                 </div>
                 <div>
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Admin Dashboard</h1>
-                    <p className="text-sm text-gray-500 mt-1 font-medium">Full platform overview and management</p>
+                    <p className="text-sm text-gray-500 mt-1 font-medium">Daily operations and user management</p>
                 </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
                     { label: 'Total Users',    value: stats.total_users,    icon: <Users className="h-6 w-6 text-blue-600" />, bgColor: 'bg-blue-50', color: 'text-blue-900' },
                     { label: 'Total Products', value: stats.total_products, icon: <Package className="h-6 w-6 text-violet-600" />, bgColor: 'bg-violet-50', color: 'text-violet-900' },
                     { label: 'Total Orders',   value: stats.total_orders,   icon: <ShoppingCart className="h-6 w-6 text-indigo-600" />, bgColor: 'bg-indigo-50', color: 'text-indigo-900' },
-                    { label: 'Total Revenue',  value: `₱${Number(stats.total_sales).toLocaleString()}`, icon: <Banknote className="h-6 w-6 text-green-600" />, bgColor: 'bg-green-50', color: 'text-green-900' },
                 ].map(stat => (
                     <Card key={stat.label} className="overflow-hidden border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 group">
                         <CardContent className="p-6">
@@ -69,39 +68,7 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Users table */}
-            <Card id="users" className="shadow-sm border-gray-100 overflow-hidden">
-                <CardHeader className="bg-gray-50/80 border-b border-gray-100 pb-4">
-                    <CardTitle className="text-lg font-bold flex items-center gap-2 text-gray-800">
-                        <Users className="w-5 h-5 text-gray-400" /> Users ({users.length})
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="px-0 py-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="pl-6">Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead className="text-center">Role</TableHead>
-                                <TableHead className="text-right pr-6">Joined</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {users.map(u => (
-                                <TableRow key={u.profile_id}>
-                                    <TableCell className="pl-6 font-medium">{u.full_name}</TableCell>
-                                    <TableCell className="text-muted-foreground">{u.email}</TableCell>
-                                    <TableCell className="text-center">
-                                        <UserRoleSelect userId={u.profile_id} currentRole={u.role_name} />
-                                    </TableCell>
-                                    <TableCell className="text-right pr-6 text-muted-foreground">
-                                        {new Date(u.created_at).toLocaleDateString()}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            <UsersTableClient users={users} allowSuperadmin={false} />
 
             {/* Products table */}
             <Card id="products" className="shadow-sm border-gray-100 overflow-hidden">
