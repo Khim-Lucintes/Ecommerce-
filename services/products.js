@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 /**
  * Get all products with store, category, first variant (price/stock), and first image.
  */
-export async function getProducts({ limit = 20, offset = 0, category_id, store_id, sort_by = 'latest' } = {}) {
+export async function getProducts({ limit = 20, offset = 0, category_id, store_id, sort_by = 'latest', q } = {}) {
     let sql = `
         SELECT
             p.product_id, p.product_name, p.description, p.created_at,
@@ -43,6 +43,11 @@ export async function getProducts({ limit = 20, offset = 0, category_id, store_i
     `;
     const params = [];
 
+    if (q?.trim()) {
+        sql += ' AND (p.product_name LIKE ? OR p.description LIKE ?)';
+        const like = `%${q.trim()}%`;
+        params.push(like, like);
+    }
     if (category_id) { sql += ' AND p.category_id = ?'; params.push(category_id); }
     if (store_id)    { sql += ' AND p.store_id = ?';    params.push(store_id); }
 
