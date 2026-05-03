@@ -24,7 +24,7 @@ export default function ProductCard({ product }) {
 
     return (
         <Link href={`/products/${product_id}`} className="group outline-none">
-            <Card className="h-full flex flex-col overflow-hidden transition-shadow hover:shadow-md">
+            <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 {/* Product image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
                     {image_url ? (
