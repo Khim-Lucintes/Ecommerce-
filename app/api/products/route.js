@@ -1,4 +1,4 @@
-import { getProducts } from '@/services/products';
+import { getProducts, createProduct } from '@/services/products';
 import { getCategories } from '@/services/categories';
 import { cookies } from 'next/headers';
 import { verifyToken, COOKIE_NAME } from '@/lib/auth';
@@ -13,6 +13,7 @@ export async function GET(request) {
             store_id: searchParams.get('store_id') ? Number(searchParams.get('store_id')) : undefined,
             limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 20,
             offset: searchParams.get('offset') ? Number(searchParams.get('offset')) : 0,
+            sort_by: searchParams.get('sort_by') || 'latest',
         };
         const products = await getProducts(opts);
         return Response.json({ products });
@@ -48,13 +49,19 @@ export async function POST(request) {
             return Response.json({ error: 'You must create a store first' }, { status: 400 });
         }
 
-        const [result] = await pool.query(
-            `INSERT INTO product_table (store_id, category_id, product_name, description, price, stock, image_url)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [stores[0].store_id, category_id, product_name.trim(), description ?? null, price, stock ?? 0, image_url ?? null]
-        );
+        // createProduct handles the transaction:
+        //   INSERT product_table → INSERT product_variant_table → INSERT product_image_table
+        const product_id = await createProduct({
+            store_id: stores[0].store_id,
+            category_id,
+            product_name: product_name.trim(),
+            description: description ?? null,
+            price,
+            stock: stock ?? 0,
+            image_url: image_url ?? null,   // Cloudinary URL lands in product_image_table
+        });
 
-        return Response.json({ message: 'Product created', product_id: result.insertId }, { status: 201 });
+        return Response.json({ message: 'Product created', product_id }, { status: 201 });
     } catch (err) {
         console.error('[POST /api/products]', err);
         return Response.json({ error: 'Failed to create product' }, { status: 500 });
