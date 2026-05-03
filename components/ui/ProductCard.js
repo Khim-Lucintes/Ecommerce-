@@ -24,14 +24,14 @@ export default function ProductCard({ product }) {
 
     return (
         <Link href={`/products/${product_id}`} className="group outline-none">
-            <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
+            <Card className="h-full flex flex-col overflow-hidden transition-shadow hover:shadow-md">
                 {/* Product image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
                     {image_url ? (
                         <img
                             src={image_url}
                             alt={product_name}
-                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="absolute inset-0 w-full h-full object-cover"
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center text-muted-foreground">

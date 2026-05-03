@@ -12,6 +12,7 @@ import ReviewList from '@/components/ui/ReviewList';
 import ReviewSection from '@/components/ui/ReviewSection';
 import WishlistButton from '@/components/ui/WishlistButton';
 import ChatWindow from '@/components/ui/ChatWindow';
+import ImageZoomModal from '@/components/ui/ImageZoomModal';
 import { Badge } from '@/components/ui/badge';
 
 export async function generateMetadata({ params }) {
@@ -63,13 +64,12 @@ export default async function ProductDetailPage({ params }) {
 
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
 
-                {/* Product image */}
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
+                {/* Product image — click to open lightbox zoom */}
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
                     {product.image_url ? (
-                        <img
+                        <ImageZoomModal
                             src={product.image_url}
                             alt={product.product_name}
-                            className="absolute inset-0 w-full h-full object-cover"
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center text-gray-300">
